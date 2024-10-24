@@ -14,6 +14,19 @@ void Tank::move(float offsetX, float offsetY) {
     shape.move(offsetX, offsetY);
 }
 
+void Tank::moveToPosition(const std::vector<std::pair<int, int>>& path) {
+    if (!path.empty()) {
+        for (const auto& position : path) {
+            float newX = position.first * cellSize;  // Convertir coordenadas de la cuadrícula a píxeles
+            float newY = position.second * cellSize;
+            shape.setPosition(newX, newY);  // Mover el tanque a la nueva posición
+            
+        }
+    }
+}
+
+
+       
 bool Tank::contains(float x, float y) const {
     return shape.getGlobalBounds().contains(x, y);
 }

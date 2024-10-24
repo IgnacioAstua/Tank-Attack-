@@ -35,8 +35,7 @@ int main() {
 
     // Inicializar los tanques en la parte inferior de la pantalla (fuera del campo de juego)
     Tank blueTank(50, mapHeight * cellSize + 20, sf::Color::Blue);
-    Tank redTank(100, mapHeight * cellSize + 20, sf::Color::Red);
-
+ 
     sf::RenderWindow window(sf::VideoMode(mapWidth * cellSize, mapHeight * cellSize + 120), "Tank Attack!");
     Tank* selectedTank = nullptr;
 
@@ -60,7 +59,6 @@ int main() {
     player1Text.setPosition(10, mapHeight * cellSize + 30);
 
     // Titulo de Jugador 2
-
     player2Text.setFont(font);
     player2Text.setCharacterSize(24);
     player2Text.setFillColor(sf::Color::Black);
@@ -76,14 +74,8 @@ int main() {
     backgroundRect.setFillColor(sf::Color::White);
     backgroundRect.setPosition(0, mapHeight * cellSize);
 
-    // Crear bloques rojos y azules en la parte inferior
-    std::vector<Block> blocks;
-    float blockStartX = 10;
-    float blockStartY = mapHeight * cellSize + 70;
-    for (int i = 0; i < 2; ++i) {
-        blocks.emplace_back(blockStartX + i * 35, blockStartY, sf::Color::Red);
-        blocks.emplace_back(blockStartX + i * 35 + 70, blockStartY, sf::Color::Blue);
-    }
+    // Eliminado: Crear bloques rojos y azules en la parte inferior
+    // Se eliminan los bloques en esta parte.
 
     std::vector<sf::RectangleShape> inGameBlocks;
 
@@ -97,22 +89,21 @@ int main() {
                 float mouseX = event.mouseButton.x;
                 float mouseY = event.mouseButton.y;
 
-                for (auto& block : blocks) {
-                    if (!block.isInGame && block.contains(mouseX, mouseY)) {
-                        block.moveToGameArea(50, 50);
-                        inGameBlocks.push_back(block.shape);
-                        break;
-                    }
-                }
-
+                // Esta sección se mantiene para manejar la selección del tanque
                 if (blueTank.contains(mouseX, mouseY)) {
                     if (selectedTank) selectedTank->deselect();
                     blueTank.select();
                     selectedTank = &blueTank;
-                } else if (redTank.contains(mouseX, mouseY)) {
-                    if (selectedTank) selectedTank->deselect();
-                    redTank.select();
-                    selectedTank = &redTank;
+                } else if (selectedTank) { // Si hay un tanque seleccionado
+                    // Obtener la posición de clic en el mapa
+                    int targetX = mouseX / cellSize;
+                    int targetY = mouseY / cellSize;
+
+                    // Calcular el camino usando BFS
+                    std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
+
+                    // Mover el tanque al nuevo destino utilizando el camino
+                    selectedTank->moveToPosition(path);
                 }
             }
 
@@ -141,12 +132,9 @@ int main() {
         window.draw(timerText);
         window.draw(player1Text);
         window.draw(player2Text);
-        for (const auto& block : blocks) {
-            window.draw(block.shape);
-        }
-        for (const auto& inGameBlock : inGameBlocks) {
-            window.draw(inGameBlock);
-        }
+
+        // Dibujar el tanque azul
+        blueTank.draw(window);
 
         window.display();
     }
