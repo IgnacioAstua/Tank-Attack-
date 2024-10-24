@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include "path.h"  // Asegúrate de incluir la cabecera de Path
 
 class Tank {
 public:
@@ -19,6 +20,7 @@ private:
     sf::RectangleShape shape;
     bool isSelected = false;
     static const int cellSize = 30; // Tamaño de cada celda en la cuadrícula
+    Path path; // Añadir la variable Path aquí
 };
 
 #endif // TANK_H

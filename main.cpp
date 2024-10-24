@@ -102,11 +102,12 @@ int main() {
                         // Calcular el camino usando BFS
                         std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
 
-                        // Mover el tanque al nuevo destino utilizando el camino
-                        if (!path.empty()) { // Verifica que la ruta no esté vacía
+                        // Verificar si la ruta es válida
+                        if (!path.empty()) {
+                            // Mover el tanque al nuevo destino utilizando el camino
                             selectedTank->moveToPosition(path);
                         } else {
-                            std::cout << "No hay un camino válido." << std::endl; // Mensaje de depuración
+                            std::cout << "No hay un camino válido." << std::endl;
                         }
                     }
                 }
@@ -115,7 +116,11 @@ int main() {
             if (selectedTank && event.type == sf::Event::MouseButtonReleased) {
                 float newX = event.mouseButton.x;
                 float newY = event.mouseButton.y;
-                selectedTank->move(newX - selectedTank->getPosition().x, newY - selectedTank->getPosition().y);
+
+                // Verificar que el tanque no esté fuera del área de juego
+                if (newX >= 0 && newX < mapWidth * cellSize && newY >= 0 && newY < mapHeight * cellSize) {
+                    selectedTank->move(newX - selectedTank->getPosition().x, newY - selectedTank->getPosition().y);
+                }
             }
         }
 
