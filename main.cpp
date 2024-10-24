@@ -3,6 +3,7 @@
 #include "tank.h"
 #include <sstream> // Para std::ostringstream
 #include <vector> // Para std::vector
+#include <iostream> // Para std::cout
 
 // Clase para los bloques
 class Block {
@@ -35,7 +36,7 @@ int main() {
 
     // Inicializar los tanques en la parte inferior de la pantalla (fuera del campo de juego)
     Tank blueTank(50, mapHeight * cellSize + 20, sf::Color::Blue);
- 
+
     sf::RenderWindow window(sf::VideoMode(mapWidth * cellSize, mapHeight * cellSize + 120), "Tank Attack!");
     Tank* selectedTank = nullptr;
 
@@ -74,9 +75,6 @@ int main() {
     backgroundRect.setFillColor(sf::Color::White);
     backgroundRect.setPosition(0, mapHeight * cellSize);
 
-    // Eliminado: Crear bloques rojos y azules en la parte inferior
-    // Se eliminan los bloques en esta parte.
-
     std::vector<sf::RectangleShape> inGameBlocks;
 
     while (window.isOpen()) {
@@ -89,7 +87,7 @@ int main() {
                 float mouseX = event.mouseButton.x;
                 float mouseY = event.mouseButton.y;
 
-                // Esta sección se mantiene para manejar la selección del tanque
+                // Manejar la selección del tanque
                 if (blueTank.contains(mouseX, mouseY)) {
                     if (selectedTank) selectedTank->deselect();
                     blueTank.select();
@@ -99,11 +97,18 @@ int main() {
                     int targetX = mouseX / cellSize;
                     int targetY = mouseY / cellSize;
 
-                    // Calcular el camino usando BFS
-                    std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
+                    // Verificar que X y Y estén dentro de los límites del mapa
+                    if (targetX >= 0 && targetX < mapWidth && targetY >= 0 && targetY < mapHeight) {
+                        // Calcular el camino usando BFS
+                        std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
 
-                    // Mover el tanque al nuevo destino utilizando el camino
-                    selectedTank->moveToPosition(path);
+                        // Mover el tanque al nuevo destino utilizando el camino
+                        if (!path.empty()) { // Verifica que la ruta no esté vacía
+                            selectedTank->moveToPosition(path);
+                        } else {
+                            std::cout << "No hay un camino válido." << std::endl; // Mensaje de depuración
+                        }
+                    }
                 }
             }
 
