@@ -20,9 +20,9 @@ void Map::draw(sf::RenderWindow& window) {
             sf::RectangleShape cell(sf::Vector2f(cellSize, cellSize));
             cell.setPosition(x * cellSize, y * cellSize);
             if (grid[y][x] == 1) { // Suponiendo que 1 representa un obstáculo
-                cell.setFillColor(sf::Color::Black);
+                cell.setFillColor(sf::Color(85, 107, 47));
             } else {
-                cell.setFillColor(sf::Color::White);
+                cell.setFillColor(sf::Color(248, 229, 197));
             }
             window.draw(cell);
         }

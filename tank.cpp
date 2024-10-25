@@ -10,7 +10,7 @@ Tank::Tank(float x, float y, sf::Color color) {
 // Método para dibujar el tanque
 void Tank::draw(sf::RenderWindow& window) {
     window.draw(shape);
-    path.draw(window);  // Dibujar el camino recorrido por el tanque
+    path.draw(window);  // Dibuja el camino recorrido por el tanque
 }
 
 // Método para mover el tanque por un desplazamiento
@@ -19,10 +19,12 @@ void Tank::move(float offsetX, float offsetY) {
 }
 
 // Método para mover el tanque usando una ruta (BFS)
-void Tank::moveToPosition(const std::vector<std::pair<int, int>>& path) {
-    this->path.setPath(path);  // Establecer el nuevo camino
-    shape.setPosition(path.back().first * cellSize, path.back().second * cellSize);
+void Tank::moveToPosition(const std::vector<std::pair<int, int>>& pathPairs) {
+    this->path.setPath(pathPairs);  // Establecer el nuevo camino
+    this->path.setColor(sf::Color(88, 42, 18)); // Cambiar el color del camino a verde musgo
+    shape.setPosition(pathPairs.back().first * cellSize, pathPairs.back().second * cellSize);
 }
+
 
 // Método para verificar si el tanque contiene el punto
 bool Tank::contains(float x, float y) const {

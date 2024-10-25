@@ -18,6 +18,8 @@ public:
     // Dibujar el camino en la ventana
     void draw(sf::RenderWindow& window);
 
+    void setColor(sf::Color color);
+
 private:
     std::vector<sf::Vertex> pathLine;  // Almacena los puntos del camino
     static const int cellSize = 30;  // Tamaño de cada celda

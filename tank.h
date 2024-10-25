@@ -15,12 +15,13 @@ public:
     void deselect();
     sf::Vector2f getPosition() const;
     void clearPath();  // Aquí elimina "Tank::" ya que es solo la declaración del método
+   
 
 private:
     sf::RectangleShape shape;
     bool isSelected = false;
     static const int cellSize = 30; // Tamaño de cada celda en la cuadrícula
-    Path path; // Añadir la variable Path aquí
+    Path path; 
 };
 
 #endif // TANK_H
