@@ -3,8 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include "path.h"  // Asegúrate de incluir la cabecera de Path
-
+#include "path.h"  
 class Tank {
 public:
     Tank(float x, float y, sf::Color color);
@@ -15,6 +14,7 @@ public:
     void select();
     void deselect();
     sf::Vector2f getPosition() const;
+    void clearPath();  // Aquí elimina "Tank::" ya que es solo la declaración del método
 
 private:
     sf::RectangleShape shape;

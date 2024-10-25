@@ -1,12 +1,25 @@
-// path.cpp
 #include "path.h"
 
-void Path::addPoint(const sf::Vector2f& point) {
-    points.push_back(sf::Vertex(point, sf::Color::Green)); // Color de la línea
+// Constructor por defecto
+Path::Path() {}
+
+// Establecer un nuevo camino
+void Path::setPath(const std::vector<std::pair<int, int>>& newPath) {
+    pathLine.clear();  // Limpiar
+    for (const auto& point : newPath) {
+        // Añadir puntos al camino, escalados por el tamaño de celda
+        pathLine.push_back(sf::Vertex(sf::Vector2f(point.first * cellSize, point.second * cellSize), sf::Color::Red));
+    }
 }
 
+// Limpiar el camino actual
+void Path::clear() {
+    pathLine.clear();
+}
+
+// Dibujar el camino en la ventana
 void Path::draw(sf::RenderWindow& window) {
-    if (points.size() > 1) {
-        window.draw(&points[0], points.size(), sf::PrimitiveType::LinesStrip);
+    if (!pathLine.empty()) {
+        window.draw(&pathLine[0], pathLine.size(), sf::LinesStrip);  // Dibujar la línea
     }
 }

@@ -8,7 +8,7 @@
 Map::Map(int width, int height, int cellSize)
     : width(width), height(height), cellSize(cellSize) {
     grid.resize(height, std::vector<int>(width, 0));
-    std::srand(static_cast<unsigned>(std::time(0))); // Inicializar la semilla aleatoria
+    std::srand(static_cast<unsigned>(std::time(0))); 
     adjacencyMatrix.resize(width * height, std::vector<int>(width * height, 0)); // Inicializar matriz de adyacencia
     generateAccessibleMap(); // Generar un mapa accesible
 }
