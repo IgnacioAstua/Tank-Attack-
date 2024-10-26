@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "path.h"  
+
 class Tank {
 public:
     Tank(float x, float y, sf::Color color);
@@ -14,14 +15,19 @@ public:
     void select();
     void deselect();
     sf::Vector2f getPosition() const;
-    void clearPath();  // Aquí elimina "Tank::" ya que es solo la declaración del método
-   
+    void clearPath();
+    
+    void decideMovement(const std::vector<std::vector<int>>& grid, int targetX, int targetY); // Nueva función para decidir el movimiento
 
 private:
     sf::RectangleShape shape;
     bool isSelected = false;
     static const int cellSize = 30; // Tamaño de cada celda en la cuadrícula
-    Path path; 
+    Path path;
+
+    std::vector<std::pair<int, int>> performBFS(const std::vector<std::vector<int>>& grid, int startX, int startY, int targetX, int targetY); // Declaración de BFS
+    std::vector<std::pair<int, int>> performRandomMovement(const std::vector<std::vector<int>>& grid, int startX, int startY); // Declaración del movimiento aleatorio
+    bool isPositionValid(int x, int y, const std::vector<std::vector<int>>& grid); // Verificar si la posición es válida
 };
 
 #endif // TANK_H
