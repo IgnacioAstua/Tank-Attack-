@@ -14,6 +14,17 @@ Tank::Tank(float x, float y, sf::Color color) {
 void Tank::draw(sf::RenderWindow& window) {
     window.draw(shape);
     path.draw(window);  // Dibuja el camino recorrido por el tanque
+
+    // Dibuja la trayectoria de la bala
+    if (!bulletPath.empty()) {
+        for (size_t i = 1; i < bulletPath.size(); ++i) {
+            sf::Vertex line[] = {
+                sf::Vertex(bulletPath[i - 1], sf::Color::Red),
+                sf::Vertex(bulletPath[i], sf::Color::Red)
+            };
+            window.draw(line, 2, sf::Lines);
+        }
+    }
 }
 
 // Método para mover el tanque por un desplazamiento
@@ -114,7 +125,7 @@ std::vector<std::pair<int, int>> Tank::performRandomMovement(const std::vector<s
     int randomX = rand() % grid.size();
     int randomY = rand() % grid[0].size();
 
-    //Posición es válida y no hay obstáculos
+    // Posición es válida y no hay obstáculos
     while (!isPositionValid(randomX, randomY, grid)) {
         randomX = rand() % grid.size();
         randomY = rand() % grid[0].size();
@@ -140,4 +151,12 @@ void Tank::decideMovement(const std::vector<std::vector<int>>& grid, int targetX
         auto pathPairs = performRandomMovement(grid, shape.getPosition().x / cellSize, shape.getPosition().y / cellSize);
         moveToPosition(pathPairs);
     }
+}
+
+void Tank::shoot(const sf::Vector2f& target) {
+    bulletPath.clear(); // Limpia la trayectoria anterior
+
+    // Aquí simplemente guardamos la posición del tanque y el objetivo
+    bulletPath.push_back(getPosition());
+    bulletPath.push_back(target);
 }
