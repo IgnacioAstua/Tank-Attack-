@@ -5,15 +5,15 @@
 
 class Bullet {
 public:
-    Bullet(float x, float y, float targetX, float targetY); // Solo los 4 parámetros
+    Bullet(float x, float y, float targetX, float targetY);
     void update();
-    void draw(sf::RenderWindow& window) const; // Asegúrate de que sea const
+    void draw(sf::RenderWindow& window) const;
     bool isOutOfBounds() const;
-
+    sf::CircleShape getShape() const;
 private:
     sf::CircleShape shape;
     sf::Vector2f direction;
-    static const float speed; // Velocidad de la bala
+    static const float speed;
 };
 
 #endif // BULLET_H

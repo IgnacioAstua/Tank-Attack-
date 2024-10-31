@@ -34,12 +34,12 @@ int main() {
     int cellSize = 30;
     Map gameMap(mapWidth, mapHeight, cellSize);
 
-    Tank blueTank1(10, mapHeight * cellSize + 60, sf::Color(70, 130, 180));
-    Tank blueTank2(50, mapHeight * cellSize + 60, sf::Color(70, 130, 180));
-    Tank lightBlueTank1(200, mapHeight * cellSize + 60, sf::Color(173, 216, 230));
-    Tank lightBlueTank2(240, mapHeight * cellSize + 60, sf::Color(173, 216, 230));
+    Tank blueTank1(10, mapHeight * cellSize + 110, sf::Color(70, 130, 180));
+    Tank blueTank2(85, mapHeight * cellSize + 110, sf::Color(70, 130, 180));
+    Tank lightBlueTank1(200, mapHeight * cellSize + 110, sf::Color(173, 216, 230));
+    Tank lightBlueTank2(280, mapHeight * cellSize + 110, sf::Color(173, 216, 230));
 
-    sf::RenderWindow window(sf::VideoMode(mapWidth * cellSize, mapHeight * cellSize + 120), "Tank Attack!");
+    sf::RenderWindow window(sf::VideoMode(mapWidth * cellSize, mapHeight * cellSize + 180), "Tank Attack!");
     Tank* selectedTank = nullptr;
 
     sf::Font font;
@@ -51,19 +51,18 @@ int main() {
     timerText.setFont(font);
     timerText.setCharacterSize(24);
     timerText.setFillColor(sf::Color::Black);
-    timerText.setPosition(10, mapHeight * cellSize);
-
+    timerText.setPosition(10, mapHeight * cellSize + 6); 
     player1Text.setFont(font);
     player1Text.setCharacterSize(24);
     player1Text.setFillColor(sf::Color::Black);
     player1Text.setString("Jugador 1");
-    player1Text.setPosition(10, mapHeight * cellSize + 30);
+    player1Text.setPosition(30, mapHeight * cellSize + 50);
 
     player2Text.setFont(font);
     player2Text.setCharacterSize(24);
     player2Text.setFillColor(sf::Color::Black);
     player2Text.setString("Jugador 2");
-    player2Text.setPosition(200, mapHeight * cellSize + 30);
+    player2Text.setPosition(230, mapHeight * cellSize + 50);
 
     turnText.setFont(font);
     turnText.setCharacterSize(24);
@@ -84,13 +83,20 @@ int main() {
     int currentPlayer = 1; // 1 para Jugador 1, 2 para Jugador 2
     int movesRemaining = 2; // Número de movimientos permitidos por turno
 
-    sf::RectangleShape backgroundRect(sf::Vector2f(mapWidth * cellSize, 90));
+    float nuevaAltura = 150; 
+    sf::RectangleShape backgroundRect(sf::Vector2f(mapWidth * cellSize, nuevaAltura));
+
     backgroundRect.setFillColor(sf::Color::White);
-    backgroundRect.setPosition(0, mapHeight * cellSize);
+    backgroundRect.setPosition(0, window.getSize().y - nuevaAltura);
+
+
 
 std::vector<Bullet> bullets; // Vector para almacenar las balas
-
 bool bulletFired = false; // Variable para controlar si se ha disparado una bala en el turno
+
+std::vector<int> lives = {2, 2, 2, 2}; // Vidas para cada tanque (2 para el jugador 1 y 2 para el jugador 2)
+std::vector<Tank*> tanks = { &blueTank1, &blueTank2, &lightBlueTank1, &lightBlueTank2 };
+
 
 while (window.isOpen()) {
     sf::Event event;
@@ -188,6 +194,7 @@ while (window.isOpen()) {
             }
         }
     }
+
     // Actualizar el cronómetro solo si el juego está activo
     if (gameActive) {
         timer -= clock.restart().asSeconds();
@@ -197,15 +204,37 @@ while (window.isOpen()) {
         }
     }
 
-    // Actualiza las balas
+    // Actualiza las balas y verifica colisiones
     for (auto it = bullets.begin(); it != bullets.end();) {
-        it->update();
-        if (it->isOutOfBounds()) {
-            it = bullets.erase(it); // Elimina la bala si está fuera de límites
-        } else {
-            ++it; // Avanza al siguiente elemento
+        it->update(); // Actualiza la posición de la bala
+
+        bool collided = false; // Para detectar colisión
+        for (size_t i = 0; i < tanks.size(); ++i) {
+            // Verifica si la bala colisiona con un tanque y no es el que disparó
+            if (tanks[i]->contains(it->getShape().getPosition().x, it->getShape().getPosition().y) && 
+                tanks[i] != selectedTank) {
+                lives[i]--; // Reduce la vida del tanque
+                if (lives[i] <= 0) {
+                    tanks[i]->deactivate(); // Desactiva el tanque
+                    it = bullets.erase(it); // Elimina la bala
+                    // No es necesario eliminar el tanque aquí, solo desactivarlo
+                    collided = true; // Marca que hubo colisión
+                    break; // Sal del bucle de colisión
+                }
+                it = bullets.erase(it); // Elimina la bala si colisionó
+                collided = true; // Marca que hubo colisión
+                break; // Sal del bucle de colisión
+            }
         }
+
+
+        if (!collided) {
+            ++it; // Solo avanza si no hubo colisión
+        }
+    
     }
+
+
 
     // Mostrar el tiempo restante
     int minutes = static_cast<int>(timer) / 60;
@@ -227,6 +256,17 @@ while (window.isOpen()) {
     window.draw(turnText);
     window.draw(errorText);
 
+    // Dibujar las vidas de los tanques
+    for (size_t i = 0; i < tanks.size(); ++i) {
+        sf::Text lifeText;
+        lifeText.setFont(font);
+        lifeText.setCharacterSize(24);
+        lifeText.setFillColor(sf::Color::Black);
+        lifeText.setString("Vidas: " + std::to_string(lives[i]));
+        lifeText.setPosition(tanks[i]->getPosition().x, tanks[i]->getPosition().y - 30); // Ajusta la posición según sea necesario
+        window.draw(lifeText);
+    }
+
     // Dibujar tanques
     blueTank1.draw(window);
     blueTank2.draw(window);
@@ -237,6 +277,14 @@ while (window.isOpen()) {
     for (const auto& bullet : bullets) {
         bullet.draw(window);
     }
+
+        /// Dibujar tanques
+    for (const auto& tank : tanks) {
+        if (tank->isActive()) {
+            tank->draw(window);
+        }
+    }
+
 
     // Si el tiempo se ha agotado, muestra un mensaje en pantalla
     if (!gameActive) {

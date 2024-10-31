@@ -12,11 +12,11 @@ public:
     bool isObstacle(int x, int y) const;
 
     // Métodos adicionales que se implementan en map.cpp
-    int getNodeIndex(int x, int y) const; // Declaración agregada
-    void updateAdjacencyMatrix(); // Declaración agregada
-    void removeRandomObstacle(); // Declaración agregada
-    bool isFullyAccessible(); // Declaración agregada
-    void generateAccessibleMap(); // Declaración agregada
+    int getNodeIndex(int x, int y) const; 
+    void updateAdjacencyMatrix(); 
+    void removeRandomObstacle();
+    bool isFullyAccessible(); 
+    void generateAccessibleMap(); 
     const std::vector<std::vector<int>>& getAdjacencyMatrix() const; // Declaración agregada
 
     // Método BFS para encontrar un camino

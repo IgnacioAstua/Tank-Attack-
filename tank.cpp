@@ -29,11 +29,13 @@ void Tank::draw(sf::RenderWindow& window) {
 
 // Método para mover el tanque por un desplazamiento
 void Tank::move(float offsetX, float offsetY) {
+    if (!active) return; 
     shape.move(offsetX, offsetY);
 }
 
 // Método para mover el tanque usando una ruta (BFS)
 void Tank::moveToPosition(const std::vector<std::pair<int, int>>& pathPairs) {
+    if (!active) return; 
     this->path.setPath(pathPairs);  // Establecer el nuevo camino
     this->path.setColor(sf::Color(88, 42, 18)); // Cambiar el color del camino a verde musgo
     shape.setPosition(pathPairs.back().first * cellSize, pathPairs.back().second * cellSize);
@@ -140,23 +142,28 @@ bool Tank::isPositionValid(int x, int y, const std::vector<std::vector<int>>& gr
     return (x >= 0 && x < grid.size() && y >= 0 && y < grid[0].size() && grid[x][y] == 0);
 }
 
-// Función para decidir el movimiento (BFS o aleatorio)
+// Método para decidir el movimiento (BFS o aleatorio)
 void Tank::decideMovement(const std::vector<std::vector<int>>& grid, int targetX, int targetY) {
-    if (rand() % 2 == 0) { // 50% de probabilidad para BFS
+    if (!active) return; // No decidir movimiento si el tanque está inactivo
+    if (rand() % 2 == 0) { 
         auto pathPairs = performBFS(grid, shape.getPosition().x / cellSize, shape.getPosition().y / cellSize, targetX, targetY);
         if (!pathPairs.empty()) {
             moveToPosition(pathPairs);
         }
-    } else { // 50% de probabilidad para movimiento aleatorio
+    } else { 
         auto pathPairs = performRandomMovement(grid, shape.getPosition().x / cellSize, shape.getPosition().y / cellSize);
         moveToPosition(pathPairs);
     }
 }
 
 void Tank::shoot(const sf::Vector2f& target) {
+    if (!active) return;
     bulletPath.clear(); // Limpia la trayectoria anterior
-
-    // Aquí simplemente guardamos la posición del tanque y el objetivo
     bulletPath.push_back(getPosition());
     bulletPath.push_back(target);
+}
+
+
+void Tank::deactivate() {
+    active = false; // Cambia el estado a inactivo
 }

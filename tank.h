@@ -17,16 +17,27 @@ public:
     void deselect();
     sf::Vector2f getPosition() const;
     void clearPath();
-    void decideMovement(const std::vector<std::vector<int>>& grid, int targetX, int targetY); // Nueva función para decidir el movimiento
+    void decideMovement(const std::vector<std::vector<int>>& grid, int targetX, int targetY);
 
-    std::vector<Bullet> bullets; // Añade un vector para almacenar las balas
+    std::vector<Bullet> bullets; // Para almacenar las balas
 
-   void shoot(const sf::Vector2f& target);
-   void draw(sf::RenderWindow& window);
-   bool hasShot = false; // Inicializado a false
+    void shoot(const sf::Vector2f& target);
+    void draw(sf::RenderWindow& window);
+    bool hasShot = false; // Inicializado a false
+
+
+    bool isActive() const { return active; } // Para comprobar si el tanque está activo
+    
+    void deactivate(); // Solo la declaración
+
+
 
 private:
+    
     sf::RectangleShape shape;
+
+    bool active = true;
+
     bool isSelected = false;
     static const int cellSize = 30; // Tamaño de cada celda en la cuadrícula
     Path path;
