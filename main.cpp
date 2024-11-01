@@ -34,10 +34,16 @@ int main() {
     int cellSize = 30;
     Map gameMap(mapWidth, mapHeight, cellSize);
 
-    Tank blueTank1(10, mapHeight * cellSize + 110, sf::Color(70, 130, 180));
-    Tank blueTank2(85, mapHeight * cellSize + 110, sf::Color(70, 130, 180));
-    Tank lightBlueTank1(200, mapHeight * cellSize + 110, sf::Color(173, 216, 230));
-    Tank lightBlueTank2(280, mapHeight * cellSize + 110, sf::Color(173, 216, 230));
+    Tank blueTank1(10, mapHeight * cellSize + 120, sf::Color(70, 130, 180));
+    Tank blueTank2(85, mapHeight * cellSize + 120, sf::Color(70, 130, 180));
+    Tank lightBlueTank1(360, mapHeight * cellSize + 120, sf::Color(173, 216, 230));
+    Tank lightBlueTank2(440, mapHeight * cellSize + 120, sf::Color(173, 216, 230));
+
+    Tank redTank1(180, mapHeight * cellSize + 120, sf::Color(255, 99, 71)); // Tanque rojo 1
+    Tank redTank2(260, mapHeight * cellSize + 120, sf::Color(255, 99, 71)); // Tanque rojo 2
+    Tank yellowTank1(530, mapHeight * cellSize + 120, sf::Color(255, 255, 128)); // Tanque amarillo 1
+    Tank yellowTank2(615, mapHeight * cellSize + 120, sf::Color(255, 255, 128)); // Tanque amarillo 2
+
 
     sf::RenderWindow window(sf::VideoMode(mapWidth * cellSize, mapHeight * cellSize + 180), "Tank Attack!");
     Tank* selectedTank = nullptr;
@@ -50,19 +56,20 @@ int main() {
     sf::Text timerText, player1Text, player2Text, turnText, errorText;
     timerText.setFont(font);
     timerText.setCharacterSize(24);
-    timerText.setFillColor(sf::Color::Black);
+    timerText.setFillColor(sf::Color::Black);;
     timerText.setPosition(10, mapHeight * cellSize + 6); 
+    
     player1Text.setFont(font);
     player1Text.setCharacterSize(24);
     player1Text.setFillColor(sf::Color::Black);
     player1Text.setString("Jugador 1");
-    player1Text.setPosition(30, mapHeight * cellSize + 50);
+    player1Text.setPosition(150, mapHeight * cellSize + 50);
 
     player2Text.setFont(font);
     player2Text.setCharacterSize(24);
     player2Text.setFillColor(sf::Color::Black);
     player2Text.setString("Jugador 2");
-    player2Text.setPosition(230, mapHeight * cellSize + 50);
+    player2Text.setPosition(500, mapHeight * cellSize + 50);
 
     turnText.setFont(font);
     turnText.setCharacterSize(24);
@@ -94,9 +101,14 @@ int main() {
 std::vector<Bullet> bullets; // Vector para almacenar las balas
 bool bulletFired = false; // Variable para controlar si se ha disparado una bala en el turno
 
-std::vector<int> lives = {2, 2, 2, 2}; // Vidas para cada tanque (2 para el jugador 1 y 2 para el jugador 2)
-std::vector<Tank*> tanks = { &blueTank1, &blueTank2, &lightBlueTank1, &lightBlueTank2 };
+std::vector<Tank*> tanks = { 
+    &blueTank1, &blueTank2, 
+    &redTank1, &redTank2, // Agrega los tanques rojos
+    &lightBlueTank1, &lightBlueTank2, 
+    &yellowTank1, &yellowTank2 // Agrega los tanques amarillos
+};
 
+std::vector<int> lives = {2, 2, 2, 2, 2, 2, 2, 2}; // Dos vidas para cada tanque
 
 while (window.isOpen()) {
     sf::Event event;
@@ -107,81 +119,96 @@ while (window.isOpen()) {
 
         if (gameActive) {  // Solo procesa eventos si el juego está activo
             if (event.type == sf::Event::MouseButtonPressed) {
-                float mouseX = event.mouseButton.x;
-                float mouseY = event.mouseButton.y;
+    float mouseX = event.mouseButton.x;
+    float mouseY = event.mouseButton.y;
 
-                // Limpiar caminos de todos los tanques antes de seleccionar uno nuevo
-                blueTank1.clearPath();
-                blueTank2.clearPath();
-                lightBlueTank1.clearPath();
-                lightBlueTank2.clearPath();
+    // Limpiar caminos de todos los tanques antes de seleccionar uno nuevo
+    for (auto& tank : tanks) {
+        tank->clearPath();
+    }
 
-                // Manejar la selección de los tanques del jugador actual
-                if (currentPlayer == 1) {
-                    if (blueTank1.contains(mouseX, mouseY)) {
-                        if (selectedTank) selectedTank->deselect();
-                        blueTank1.select();
-                        selectedTank = &blueTank1;
-                    } else if (blueTank2.contains(mouseX, mouseY)) {
-                        if (selectedTank) selectedTank->deselect();
-                        blueTank2.select();
-                        selectedTank = &blueTank2;
-                    }
+    // Manejar la selección de los tanques del jugador actual
+    if (currentPlayer == 1) { // Jugador 1
+        if (blueTank1.contains(mouseX, mouseY)) {
+            if (selectedTank) selectedTank->deselect();
+            blueTank1.select();
+            selectedTank = &blueTank1;
+        } else if (blueTank2.contains(mouseX, mouseY)) {
+            if (selectedTank) selectedTank->deselect();
+            blueTank2.select();
+            selectedTank = &blueTank2;
+        } else if (redTank1.contains(mouseX, mouseY)) { // Agregar tanques rojos
+            if (selectedTank) selectedTank->deselect();
+            redTank1.select();
+            selectedTank = &redTank1;
+        } else if (redTank2.contains(mouseX, mouseY)) {
+            if (selectedTank) selectedTank->deselect();
+            redTank2.select();
+            selectedTank = &redTank2;
+        }
+    } else { // Jugador 2
+        if (lightBlueTank1.contains(mouseX, mouseY)) {
+            if (selectedTank) selectedTank->deselect();
+            lightBlueTank1.select();
+            selectedTank = &lightBlueTank1;
+        } else if (lightBlueTank2.contains(mouseX, mouseY)) {
+            if (selectedTank) selectedTank->deselect();
+            lightBlueTank2.select();
+            selectedTank = &lightBlueTank2;
+        } else if (yellowTank1.contains(mouseX, mouseY)) { // Agregar tanques amarillos
+            if (selectedTank) selectedTank->deselect();
+            yellowTank1.select();
+            selectedTank = &yellowTank1;
+        } else if (yellowTank2.contains(mouseX, mouseY)) {
+            if (selectedTank) selectedTank->deselect();
+            yellowTank2.select();
+            selectedTank = &yellowTank2;
+        }
+    }
+
+    // Mover el tanque seleccionado
+    if (event.mouseButton.button == sf::Mouse::Left) {
+        if (selectedTank && movesRemaining > 0) {
+            int targetX = mouseX / cellSize;
+            int targetY = mouseY / cellSize;
+
+            if (targetX >= 0 && targetX < mapWidth && targetY >= 0 && targetY < mapHeight) {
+                std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
+
+                if (!path.empty()) {
+                    selectedTank->moveToPosition(path);
+                    movesRemaining--; // Reduce los movimientos restantes
+                    errorText.setString(""); // Limpiar mensaje de error
                 } else {
-                    if (lightBlueTank1.contains(mouseX, mouseY)) {
-                        if (selectedTank) selectedTank->deselect();
-                        lightBlueTank1.select();
-                        selectedTank = &lightBlueTank1;
-                    } else if (lightBlueTank2.contains(mouseX, mouseY)) {
-                        if (selectedTank) selectedTank->deselect();
-                        lightBlueTank2.select();
-                        selectedTank = &lightBlueTank2;
-                    }
-                }
-
-                // Mover el tanque seleccionado si hay uno y hay clic izquierdo
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    if (selectedTank && movesRemaining > 0) {
-                        int targetX = mouseX / cellSize;
-                        int targetY = mouseY / cellSize;
-
-                        if (targetX >= 0 && targetX < mapWidth && targetY >= 0 && targetY < mapHeight) {
-                            std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
-
-                            if (!path.empty()) {
-                                selectedTank->moveToPosition(path);
-                                movesRemaining--; // Reduce los movimientos restantes
-                                errorText.setString(""); // Limpiar mensaje de error
-                            } else {
-                                errorText.setString("Camino bloqueado"); // Actualiza el mensaje de error
-                                errorText.setPosition(mapWidth * cellSize - 256, mapHeight * cellSize + 50);
-                                errorText.setFillColor(sf::Color(255, 182, 193)); // Verde pastel
-                            }
-                        }
-                    }
-
-                    // Comprobar si se debe pasar el turno
-                    if (movesRemaining == 0) {
-                        currentPlayer = (currentPlayer == 1) ? 2 : 1; // Cambiar de jugador
-                        movesRemaining = 2; // Reiniciar movimientos para el nuevo jugador
-                        selectedTank = nullptr; // Deseleccionar cualquier tanque
-                        bulletFired = false; // Reiniciar la variable de disparo
-                    }
-                }
-
-                // Disparar la bala si se hace clic derecho
-                if (event.mouseButton.button == sf::Mouse::Right) {
-                    if (selectedTank && !bulletFired) { // Comprobar si ya se disparó una bala
-                        bullets.emplace_back(
-                            selectedTank->getPosition().x, 
-                            selectedTank->getPosition().y, 
-                            mouseX, 
-                            mouseY
-                        );
-                        bulletFired = true; // Marcar que se ha disparado una bala
-                    }
+                    errorText.setString("Camino bloqueado"); // Mensaje de error
+                    errorText.setPosition(mapWidth * cellSize - 180, mapHeight * cellSize + 50);
+                    errorText.setFillColor(sf::Color(255, 182, 193)); 
                 }
             }
+        }
+
+        // Comprobar si se debe pasar el turno
+        if (movesRemaining == 0) {
+            currentPlayer = (currentPlayer == 1) ? 2 : 1; // Cambiar de jugador
+            movesRemaining = 2; // Reiniciar movimientos para el nuevo jugador
+            selectedTank = nullptr; // Deseleccionar cualquier tanque
+            bulletFired = false; // Reiniciar la variable de disparo
+        }
+    }
+
+    // Disparar la bala si se hace clic derecho
+    if (event.mouseButton.button == sf::Mouse::Right) {
+        if (selectedTank && !bulletFired) {
+            bullets.emplace_back(
+                selectedTank->getPosition().x, 
+                selectedTank->getPosition().y, 
+                mouseX, 
+                mouseY
+            );
+            bulletFired = true; // Marcar que se ha disparado una bala
+        }
+    }
+}
 
             if (selectedTank && event.type == sf::Event::MouseButtonReleased) {
                 // Eliminar el movimiento al soltar el clic del mouse
@@ -245,7 +272,7 @@ while (window.isOpen()) {
 
     // Actualizar el texto del turno
     turnText.setString("Turno: Jugador " + std::to_string(currentPlayer));
-    turnText.setPosition(mapWidth * cellSize - 250, mapHeight * cellSize + 10);
+    turnText.setPosition(mapWidth * cellSize - 176, mapHeight * cellSize + 10);
 
     window.clear(sf::Color::White);
     gameMap.draw(window);
