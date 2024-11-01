@@ -117,102 +117,101 @@ while (window.isOpen()) {
             window.close();
         }
 
-        if (gameActive) {  // Solo procesa eventos si el juego está activo
+        if (gameActive) {
             if (event.type == sf::Event::MouseButtonPressed) {
-    float mouseX = event.mouseButton.x;
-    float mouseY = event.mouseButton.y;
+                float mouseX = event.mouseButton.x;
+                float mouseY = event.mouseButton.y;
 
-    // Limpiar caminos de todos los tanques antes de seleccionar uno nuevo
-    for (auto& tank : tanks) {
-        tank->clearPath();
-    }
+                // Limpiar caminos de todos los tanques antes de seleccionar uno nuevo
+                for (auto& tank : tanks) {
+                    tank->clearPath();
+                }
 
-    // Manejar la selección de los tanques del jugador actual
-    if (currentPlayer == 1) { // Jugador 1
-        if (blueTank1.contains(mouseX, mouseY)) {
-            if (selectedTank) selectedTank->deselect();
-            blueTank1.select();
-            selectedTank = &blueTank1;
-        } else if (blueTank2.contains(mouseX, mouseY)) {
-            if (selectedTank) selectedTank->deselect();
-            blueTank2.select();
-            selectedTank = &blueTank2;
-        } else if (redTank1.contains(mouseX, mouseY)) { // Agregar tanques rojos
-            if (selectedTank) selectedTank->deselect();
-            redTank1.select();
-            selectedTank = &redTank1;
-        } else if (redTank2.contains(mouseX, mouseY)) {
-            if (selectedTank) selectedTank->deselect();
-            redTank2.select();
-            selectedTank = &redTank2;
-        }
-    } else { // Jugador 2
-        if (lightBlueTank1.contains(mouseX, mouseY)) {
-            if (selectedTank) selectedTank->deselect();
-            lightBlueTank1.select();
-            selectedTank = &lightBlueTank1;
-        } else if (lightBlueTank2.contains(mouseX, mouseY)) {
-            if (selectedTank) selectedTank->deselect();
-            lightBlueTank2.select();
-            selectedTank = &lightBlueTank2;
-        } else if (yellowTank1.contains(mouseX, mouseY)) { // Agregar tanques amarillos
-            if (selectedTank) selectedTank->deselect();
-            yellowTank1.select();
-            selectedTank = &yellowTank1;
-        } else if (yellowTank2.contains(mouseX, mouseY)) {
-            if (selectedTank) selectedTank->deselect();
-            yellowTank2.select();
-            selectedTank = &yellowTank2;
-        }
-    }
-
-    // Mover el tanque seleccionado
-    if (event.mouseButton.button == sf::Mouse::Left) {
-        if (selectedTank && movesRemaining > 0) {
-            int targetX = mouseX / cellSize;
-            int targetY = mouseY / cellSize;
-
-            if (targetX >= 0 && targetX < mapWidth && targetY >= 0 && targetY < mapHeight) {
-                std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
-
-                if (!path.empty()) {
-                    selectedTank->moveToPosition(path);
-                    movesRemaining--; // Reduce los movimientos restantes
-                    errorText.setString(""); // Limpiar mensaje de error
+                // Manejar la selección de los tanques del jugador actual
+                if (currentPlayer == 1) {
+                    if (blueTank1.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        blueTank1.select();
+                        selectedTank = &blueTank1;
+                    } else if (blueTank2.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        blueTank2.select();
+                        selectedTank = &blueTank2;
+                    } else if (redTank1.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        redTank1.select();
+                        selectedTank = &redTank1;
+                    } else if (redTank2.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        redTank2.select();
+                        selectedTank = &redTank2;
+                    }
                 } else {
-                    errorText.setString("Camino bloqueado"); // Mensaje de error
-                    errorText.setPosition(mapWidth * cellSize - 180, mapHeight * cellSize + 50);
-                    errorText.setFillColor(sf::Color(255, 182, 193)); 
+                    if (lightBlueTank1.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        lightBlueTank1.select();
+                        selectedTank = &lightBlueTank1;
+                    } else if (lightBlueTank2.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        lightBlueTank2.select();
+                        selectedTank = &lightBlueTank2;
+                    } else if (yellowTank1.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        yellowTank1.select();
+                        selectedTank = &yellowTank1;
+                    } else if (yellowTank2.contains(mouseX, mouseY)) {
+                        if (selectedTank) selectedTank->deselect();
+                        yellowTank2.select();
+                        selectedTank = &yellowTank2;
+                    }
+                }
+
+                // Mover el tanque seleccionado
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    if (selectedTank && movesRemaining > 0) {
+                        int targetX = mouseX / cellSize;
+                        int targetY = mouseY / cellSize;
+
+                        if (targetX >= 0 && targetX < mapWidth && targetY >= 0 && targetY < mapHeight) {
+                            std::vector<std::pair<int, int>> path = gameMap.BFS(selectedTank->getPosition(), { targetX, targetY });
+
+                            if (!path.empty()) {
+                                selectedTank->moveToPosition(path);
+                                movesRemaining--; // Reduce los movimientos restantes
+                                errorText.setString(""); // Limpiar mensaje de error
+                            } else {
+                                errorText.setString("Camino bloqueado");
+                                errorText.setPosition(mapWidth * cellSize - 180, mapHeight * cellSize + 50);
+                                errorText.setFillColor(sf::Color(255, 182, 193)); 
+                            }
+                        }
+                    }
+
+                    // Comprobar si se debe pasar el turno
+                    if (movesRemaining == 0) {
+                        currentPlayer = (currentPlayer == 1) ? 2 : 1; // Cambiar de jugador
+                        movesRemaining = 2; // Reiniciar movimientos para el nuevo jugador
+                        selectedTank = nullptr; // Deseleccionar cualquier tanque
+                        bulletFired = false; // Reiniciar la variable de disparo
+                    }
+                }
+
+                // Disparar la bala si se hace clic derecho
+                if (event.mouseButton.button == sf::Mouse::Right) {
+                    if (selectedTank && !bulletFired) {
+                        bullets.emplace_back(
+                            selectedTank->getPosition().x, 
+                            selectedTank->getPosition().y, 
+                            mouseX, 
+                            mouseY
+                        );
+                        bulletFired = true; // Marcar que se ha disparado una bala
+                    }
                 }
             }
-        }
-
-        // Comprobar si se debe pasar el turno
-        if (movesRemaining == 0) {
-            currentPlayer = (currentPlayer == 1) ? 2 : 1; // Cambiar de jugador
-            movesRemaining = 2; // Reiniciar movimientos para el nuevo jugador
-            selectedTank = nullptr; // Deseleccionar cualquier tanque
-            bulletFired = false; // Reiniciar la variable de disparo
-        }
-    }
-
-    // Disparar la bala si se hace clic derecho
-    if (event.mouseButton.button == sf::Mouse::Right) {
-        if (selectedTank && !bulletFired) {
-            bullets.emplace_back(
-                selectedTank->getPosition().x, 
-                selectedTank->getPosition().y, 
-                mouseX, 
-                mouseY
-            );
-            bulletFired = true; // Marcar que se ha disparado una bala
-        }
-    }
-}
 
             if (selectedTank && event.type == sf::Event::MouseButtonReleased) {
                 // Eliminar el movimiento al soltar el clic del mouse
-                // Solo mueve el tanque si se trata de un clic izquierdo
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     float newX = event.mouseButton.x;
                     float newY = event.mouseButton.y;
@@ -227,41 +226,37 @@ while (window.isOpen()) {
         timer -= clock.restart().asSeconds();
         if (timer <= 0) {
             timer = 0;
-            gameActive = false;  // Detener el juego cuando el tiempo se agota
+            gameActive = false; // Detener el juego cuando el tiempo se agota
         }
     }
 
-    // Actualiza las balas y verifica colisiones
+    // Actualiza las balas
     for (auto it = bullets.begin(); it != bullets.end();) {
         it->update(); // Actualiza la posición de la bala
 
-        bool collided = false; // Para detectar colisión
-        for (size_t i = 0; i < tanks.size(); ++i) {
-            // Verifica si la bala colisiona con un tanque y no es el que disparó
-            if (tanks[i]->contains(it->getShape().getPosition().x, it->getShape().getPosition().y) && 
-                tanks[i] != selectedTank) {
-                lives[i]--; // Reduce la vida del tanque
-                if (lives[i] <= 0) {
-                    tanks[i]->deactivate(); // Desactiva el tanque
-                    it = bullets.erase(it); // Elimina la bala
-                    // No es necesario eliminar el tanque aquí, solo desactivarlo
+        if (it->shouldRemove()) {
+            it = bullets.erase(it); // Elimina la bala si ha rebotado 2 veces
+        } else {
+            // Comprobar colisiones con los tanques
+            bool collided = false;
+            for (size_t i = 0; i < tanks.size(); ++i) {
+                if (tanks[i]->contains(it->getShape().getPosition().x, it->getShape().getPosition().y) && 
+                    tanks[i] != selectedTank) {
+                    lives[i]--; // Reduce la vida del tanque
+                    if (lives[i] <= 0) {
+                        tanks[i]->deactivate(); // Desactiva el tanque
+                    }
+                    it = bullets.erase(it); // Elimina la bala si colisionó
                     collided = true; // Marca que hubo colisión
                     break; // Sal del bucle de colisión
                 }
-                it = bullets.erase(it); // Elimina la bala si colisionó
-                collided = true; // Marca que hubo colisión
-                break; // Sal del bucle de colisión
+            }
+
+            if (!collided) {
+                ++it; // Solo avanza si no hubo colisión
             }
         }
-
-
-        if (!collided) {
-            ++it; // Solo avanza si no hubo colisión
-        }
-    
     }
-
-
 
     // Mostrar el tiempo restante
     int minutes = static_cast<int>(timer) / 60;
@@ -290,7 +285,7 @@ while (window.isOpen()) {
         lifeText.setCharacterSize(24);
         lifeText.setFillColor(sf::Color::Black);
         lifeText.setString("Vidas: " + std::to_string(lives[i]));
-        lifeText.setPosition(tanks[i]->getPosition().x, tanks[i]->getPosition().y - 30); // Ajusta la posición según sea necesario
+        lifeText.setPosition(tanks[i]->getPosition().x, tanks[i]->getPosition().y - 30);
         window.draw(lifeText);
     }
 
@@ -305,13 +300,12 @@ while (window.isOpen()) {
         bullet.draw(window);
     }
 
-        /// Dibujar tanques
+    // Dibujar los tanques activos
     for (const auto& tank : tanks) {
         if (tank->isActive()) {
             tank->draw(window);
         }
     }
-
 
     // Si el tiempo se ha agotado, muestra un mensaje en pantalla
     if (!gameActive) {
